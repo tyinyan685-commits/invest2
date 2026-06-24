@@ -10,8 +10,10 @@
 - DeepSeek-first LLM provider with an OpenAI Responses API adapter
 - Supabase clients and initial database migration
 - Server-only key boundaries and environment template
+- On-demand stock analysis using FMP, NewsAPI, and DeepSeek
+- Six-hour report cache with graceful operation before database setup
 
-The displayed research is demo content reconstructed from the supplied PDFs. It is not live market data.
+The homepage examples are reconstructed from the supplied PDFs. The personal research desk at `/admin` uses live provider data when the server environment is configured.
 
 ## Local setup
 

@@ -6,6 +6,8 @@ export const researchOutputSchema = z.object({
   rating: z.enum(["buy-research", "hold", "avoid", "needs-checking"]),
   confidence: z.number().min(0).max(100),
   facts: z.array(z.object({ claim: z.string(), sourceIds: z.array(z.string()), strength: z.enum(["strong", "medium", "weak"]) })),
+  sections: z.array(z.object({ title: z.string(), judgment: z.string(), evidenceIds: z.array(z.string()) })),
+  scenarios: z.array(z.object({ name: z.string(), condition: z.string(), interpretation: z.string() })),
   risks: z.array(z.object({ condition: z.string(), consequence: z.string() })),
   missingEvidence: z.array(z.string()),
 });

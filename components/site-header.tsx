@@ -12,7 +12,7 @@ export function SiteHeader() {
       <nav className="nav-links" aria-label="主导航">
         <Link href="/">研究</Link>
         <Link href="/market/2026-06-16">市场扫描</Link>
-        <Link href="/admin">生成报告</Link>
+        <Link href="/admin">股票查询</Link>
       </nav>
       <button className="search-button" type="button" aria-label="搜索研究">
         <Search size={16} />
