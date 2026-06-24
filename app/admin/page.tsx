@@ -15,7 +15,7 @@ export default function AdminPage() {
             <label>股票代码<input defaultValue="MU" placeholder="例如 MU、NVDA、AAPL" /></label>
             <div className="form-row"><label>报告类型<select defaultValue="decision"><option value="decision">决策摘要</option><option value="deep">深度研究</option><option value="challenge">论点压力测试</option></select></label><label>市场<select defaultValue="US"><option value="US">美股</option><option value="HK">港股</option><option value="CN">A 股</option></select></label></div>
             <label>特别关注<textarea placeholder="例如：重点检查 HBM 周期、财报缺口风险和前瞻估值" rows={4} /></label>
-            <button className="button button-primary generate-button" disabled={!configured} type="button"><Play size={16} /> {configured ? "开始生成" : "等待环境配置"}</button>
+            <button className="button button-primary generate-button" disabled type="button"><Play size={16} /> {configured ? "研究引擎接入中" : "等待环境配置"}</button>
           </section>
           <aside className="setup-card">
             <h2>上线前还差两步</h2>
