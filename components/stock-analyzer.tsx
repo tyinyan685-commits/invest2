@@ -2,20 +2,10 @@
 
 import { FormEvent, useState } from "react";
 import { AlertTriangle, ArrowUpRight, CheckCircle2, LoaderCircle, Play, RefreshCw, Search } from "lucide-react";
+import type { ResearchOutput } from "@/lib/llm";
+import { ResearchMethodReport } from "@/components/research-method-report";
 
-type Analysis = {
-  headline: string;
-  summary: string;
-  rating: "buy-research" | "hold" | "avoid" | "needs-checking";
-  confidence: number;
-  facts: Array<{ claim: string; sourceIds: string[]; strength: "strong" | "medium" | "weak" }>;
-  sections: Array<{ title: string; judgment: string; evidenceIds: string[] }>;
-  scenarios: Array<{ name: string; condition: string; interpretation: string }>;
-  risks: Array<{ condition: string; consequence: string }>;
-  missingEvidence: string[];
-};
-
-type Result = { symbol: string; cached: boolean; slug?: string | null; analysis: Analysis };
+type Result = { symbol: string; cached: boolean; slug?: string | null; analysis: ResearchOutput };
 
 const ratingLabels = { "buy-research": "优先研究", hold: "继续观察", avoid: "暂时回避", "needs-checking": "待核验" };
 
@@ -64,6 +54,7 @@ export function StockAnalyzer({ configured }: { configured: boolean }) {
           <div><h3>主要风险</h3>{result.analysis.risks.map((risk, index) => <article className="analysis-line risk-line" key={`${risk.condition}-${index}`}><AlertTriangle size={15} /><p><strong>{risk.condition}</strong>{risk.consequence}</p></article>)}</div>
         </div>
         <div className="scenario-cards">{result.analysis.scenarios.map((scenario) => <article key={scenario.name}><span>{scenario.name}</span><b>{scenario.condition}</b><p>{scenario.interpretation}</p></article>)}</div>
+        <ResearchMethodReport analysis={result.analysis} />
         <footer>
           <span>{result.cached ? "六小时内缓存结果" : result.slug ? "已保存至研究历史" : "结果已生成，数据库迁移后可保存历史"}</span>
           <button type="button" disabled={loading} onClick={(event) => analyze(event as unknown as FormEvent, true)}><RefreshCw size={14} /> 忽略缓存重新分析</button>

@@ -25,7 +25,7 @@ export function createDeepSeekProvider(): LlmProvider {
             model,
             response_format: { type: "json_object" },
             temperature: 0.2,
-            max_tokens: 6_000,
+            max_tokens: 10_000,
             messages: [
               { role: "system", content: `${input.system}\n所有叙述性字符串必须使用简体中文，只有股票代码、公司名、产品名和来源 ID 可以保留英文。禁止输出英文段落。Return valid JSON matching the requested schema. Do not invent missing facts.` },
               { role: "user", content: input.prompt },

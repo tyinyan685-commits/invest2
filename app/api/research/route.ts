@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getLlmProvider } from "@/lib/llm";
+import { buildDecisionReportPrompt } from "@/lib/llm/report-method";
 import { getFmpSnapshot } from "@/lib/market-data/fmp";
 import { getNewsSnapshot } from "@/lib/market-data/news";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -35,6 +36,8 @@ async function readCachedReport(symbol: string) {
     const cutoff = new Date(Date.now() - 6 * 60 * 60_000).toISOString();
     const { data } = await supabase.from("reports").select("slug,content,as_of").eq("symbol", symbol).eq("status", "published").gte("as_of", cutoff).order("as_of", { ascending: false }).limit(1).maybeSingle();
     if (!data?.content) return null;
+    const content = data.content as { analysis?: { methodologyVersion?: string } };
+    if (content.analysis?.methodologyVersion !== "deep-v2") return null;
     return { slug: data.slug, asOf: data.as_of, ...(data.content as Record<string, unknown>) };
   } catch {
     return null;
@@ -84,8 +87,8 @@ export async function POST(request: NextRequest) {
     const snapshot = { symbol, asOf: new Date().toISOString(), marketData: fmp, news };
     const provider = getLlmProvider();
     const analysis = await provider.generateResearch({
-      system: "你是严谨的中文股票研究员。只允许使用输入快照中的事实。区分事实与解释，不给保证收益，不使用直接买卖指令。数值缺失时明确写待核验。所有标题、摘要、判断、情景和风险必须用简洁自然的简体中文书写。",
-      prompt: `请用简体中文分析 ${symbol}。以下是冻结的数据快照：\n${JSON.stringify(snapshot)}\n\n输出一个 JSON 对象。除股票代码、公司名、产品名和 sourceIds 外，所有字符串值必须是简体中文，不能出现英文段落。JSON 必须严格包含这些字段：headline(string), summary(string), rating(buy-research|hold|avoid|needs-checking), confidence(0-100 number), facts([{claim,sourceIds,strength(strong|medium|weak)}]), sections([{title,judgment,evidenceIds}])，sections 至少覆盖基本面、估值、技术面、新闻与事件，scenarios([{name,condition,interpretation}])且包含乐观/基准/悲观三种，risks([{condition,consequence}]), missingEvidence([string])。sourceIds 使用 fmp:quote、fmp:profile、fmp:financials、fmp:technicals 或 news:N。所有结论必须能追溯到这些 sourceIds。`,
+      system: "你是投资研究流程中的总协调者。你必须先完成四分析师冻结报告，再进行多空辩论、研究经理裁决、交易计划、风险三方压力测试，最后由组合经理作条件化决策。所有事实受输入快照约束，所有正文使用简体中文。",
+      prompt: buildDecisionReportPrompt(symbol, snapshot),
     });
     const slug = await saveReport(symbol, snapshot, analysis);
     return NextResponse.json({ symbol, cached: false, slug, snapshot, analysis });

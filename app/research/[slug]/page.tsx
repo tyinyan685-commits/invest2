@@ -4,6 +4,7 @@ import { AlertTriangle, ArrowLeft, CheckCircle2, Clock3 } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { ResearchOutput } from "@/lib/llm";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ResearchMethodReport } from "@/components/research-method-report";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +50,7 @@ export default async function GeneratedResearchPage({ params }: PageProps) {
             <div><h2>主要风险</h2>{analysis.risks.map((risk, index) => <article className="analysis-line risk-line" key={`${risk.condition}-${index}`}><AlertTriangle size={15} /><p><strong>{risk.condition}</strong>{risk.consequence}</p></article>)}</div>
           </div>
           <div className="scenario-cards">{analysis.scenarios.map((scenario) => <article key={scenario.name}><span>{scenario.name}</span><b>{scenario.condition}</b><p>{scenario.interpretation}</p></article>)}</div>
+          <ResearchMethodReport analysis={analysis} />
           {analysis.missingEvidence.length > 0 && <div className="missing-evidence"><h2>仍需核验</h2><ul>{analysis.missingEvidence.map((item) => <li key={item}>{item}</li>)}</ul></div>}
         </section>
       </div>
