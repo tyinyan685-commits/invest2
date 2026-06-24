@@ -12,6 +12,7 @@ ${JSON.stringify(snapshot)}
 4. 每个核心观点必须给 evidenceIds。可用：fmp:quote、fmp:profile、fmp:financials、fmp:technicals、fmp:insiders、fmp:filings、fmp:earnings、fmp:macro、fmp:sentiment、news:N。
 5. 数据缺失必须写入 dataStatus 与 missingEvidence，不能用模型记忆补齐。
 6. 交易建议必须是条件化计划，不得保证收益；用收盘确认、财报/宏观事件和逻辑失效条件约束。
+7. 输出采用决策简报密度：每个字符串原则上不超过 120 个汉字；不要重复同一事实，不要写长篇背景介绍。
 
 【按顺序完成内部研究流程】
 A. 四份冻结分析师报告
@@ -46,6 +47,7 @@ F. 组合经理最终决策
 executiveSummary 放最重要的三到五条理由和三到六个风险触发。
 analysts、debate、riskPanel、tradePlan、portfolioManager、dataStatus、nextChecks 必须全部填写。
 所有叙述性字符串必须为简体中文，股票代码、公司/产品名、评级字母和 evidenceIds 除外。
+为控制生成时间，数量严格限制为：facts 6 条、sections 4 条、scenarios 3 条、risks 5 条、coreReasons 3 条、riskTriggers 3 条、keyLevels 4 条、牛方与空方各 3 条、topRisks 3 条；entrySteps 与 reduceSteps 各不超过 3 条，dataStatus 不超过 8 条，nextChecks 不超过 5 条。
 
 【精确 JSON 契约】
 必须逐字使用下列键名和枚举值，不得改名、漏项或增加 Markdown 代码围栏。示例中的中文说明必须替换为本次研究内容：
