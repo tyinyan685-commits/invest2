@@ -46,5 +46,54 @@ F. 组合经理最终决策
 executiveSummary 放最重要的三到五条理由和三到六个风险触发。
 analysts、debate、riskPanel、tradePlan、portfolioManager、dataStatus、nextChecks 必须全部填写。
 所有叙述性字符串必须为简体中文，股票代码、公司/产品名、评级字母和 evidenceIds 除外。
+
+【精确 JSON 契约】
+必须逐字使用下列键名和枚举值，不得改名、漏项或增加 Markdown 代码围栏。示例中的中文说明必须替换为本次研究内容：
+枚举只能从这些值中选择：rating = buy-research/hold/avoid/needs-checking；strength = strong/medium/weak；severity = high/medium/low；evidenceStrength = strong/medium/weak/needs-checking；finalRating = BUY/HOLD/SELL/WATCH；status = success/degraded/missing。
+{
+  "methodologyVersion": "deep-v2",
+  "headline": "中文标题",
+  "summary": "中文摘要",
+  "rating": "hold",
+  "confidence": 0,
+  "facts": [{ "claim": "中文事实", "sourceIds": ["fmp:quote"], "strength": "medium" }],
+  "sections": [{ "title": "中文小节", "judgment": "中文判断", "evidenceIds": ["fmp:financials"] }],
+  "scenarios": [{ "name": "中文情景", "condition": "中文条件", "interpretation": "中文解释" }],
+  "risks": [{ "condition": "中文风险条件", "consequence": "中文后果" }],
+  "missingEvidence": ["中文缺失项"],
+  "executiveSummary": {
+    "oneSentence": "中文一句话结论",
+    "positionAction": "中文当前行动",
+    "coreReasons": [{ "point": "中文理由", "evidenceIds": ["fmp:technicals"], "strength": "medium" }],
+    "riskTriggers": [{ "condition": "中文触发条件", "response": "中文应对", "severity": "medium" }]
+  },
+  "analysts": {
+    "fundamentals": { "judgment": "中文", "quality": "中文", "earningsTrend": "中文", "valuation": "中文", "estimates": "中文", "cashFlowAndBalanceSheet": "中文", "evidenceIds": ["fmp:financials"], "mainRisk": "中文" },
+    "technical": { "judgment": "中文", "trend": "中文", "momentum": "中文", "volatility": "中文", "volumePrice": "中文", "keyLevels": [{ "label": "中文", "price": null, "meaning": "中文" }], "evidenceIds": ["fmp:technicals"] },
+    "news": { "judgment": "中文", "companyEvents": ["中文"], "macroEvents": ["中文"], "nextCatalysts": ["中文"], "evidenceIds": ["news:0"], "limitations": "中文" },
+    "sentiment": { "direction": "中文", "crowding": "中文", "evidenceStrength": "needs-checking", "observations": ["中文"], "limitations": "中文" }
+  },
+  "debate": {
+    "bull": { "arguments": [{ "point": "中文", "strength": "medium", "evidenceIds": ["fmp:financials"] }], "weakestPoint": "中文" },
+    "bear": { "arguments": [{ "point": "中文", "strength": "medium", "evidenceIds": ["fmp:technicals"] }], "strongestCounterpoint": "中文" },
+    "managerVerdict": { "verdict": "中文", "acceptedBull": "中文", "discountedBull": "中文", "acceptedBear": "中文", "decisionLogic": "中文" }
+  },
+  "riskPanel": {
+    "aggressive": { "position": "中文", "rationale": "中文", "cost": "中文" },
+    "neutral": { "position": "中文", "rationale": "中文", "calibration": "中文" },
+    "conservative": { "position": "中文", "worstCase": "中文", "protection": "中文" }
+  },
+  "tradePlan": {
+    "posture": "中文", "currentAction": "中文",
+    "entrySteps": [{ "condition": "中文", "action": "中文", "allocationPct": null, "priceLevel": null }],
+    "reduceSteps": [{ "condition": "中文", "action": "中文", "priceLevel": null }],
+    "eventRules": ["中文"], "upsideReferences": [], "downsideReferences": [], "invalidation": "中文", "riskReward": "中文"
+  },
+  "portfolioManager": {
+    "finalRating": "WATCH", "ratingReason": "中文", "targetPosition": "中文", "actionSummary": "中文", "eventStance": "中文", "priceFramework": "中文", "topRisks": ["中文风险一", "中文风险二", "中文风险三"]
+  },
+  "dataStatus": [{ "category": "中文类别", "source": "中文来源", "status": "success", "notes": "中文" }],
+  "nextChecks": ["中文核验动作"]
+}
 `;
 }
