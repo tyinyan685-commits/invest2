@@ -57,6 +57,31 @@ export const researchOutputSchema = z.object({
   nextChecks: z.array(z.string()),
 });
 
+export const fundamentalStageSchema = researchOutputSchema.shape.analysts.shape.fundamentals;
+export const technicalStageSchema = researchOutputSchema.shape.analysts.shape.technical;
+export const newsStageSchema = researchOutputSchema.shape.analysts.shape.news;
+export const sentimentStageSchema = researchOutputSchema.shape.analysts.shape.sentiment;
+export const debateStageSchema = researchOutputSchema.shape.debate;
+export const executionStageSchema = z.object({
+  riskPanel: researchOutputSchema.shape.riskPanel,
+  tradePlan: researchOutputSchema.shape.tradePlan,
+});
+export const portfolioStageSchema = researchOutputSchema.pick({
+  headline: true,
+  summary: true,
+  rating: true,
+  confidence: true,
+  facts: true,
+  sections: true,
+  scenarios: true,
+  risks: true,
+  missingEvidence: true,
+  executiveSummary: true,
+  portfolioManager: true,
+  dataStatus: true,
+  nextChecks: true,
+});
+
 export type ResearchOutput = z.infer<typeof researchOutputSchema>;
 
 export interface GenerateResearchInput {
