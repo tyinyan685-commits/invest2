@@ -19,7 +19,7 @@ export type StoredStages = Partial<Record<ResearchStageName, unknown>>;
 const system = "你是多角色投资决策委员会中的专业研究员。必须以冻结快照为唯一事实边界，明确区分事实、推断和缺失证据。输出应详细、可审计、可用于后续角色继续研究，但不构成个性化投资建议。";
 
 function base(symbol: string, snapshot: unknown) {
-  return `研究标的：${symbol}\n冻结数据快照：${JSON.stringify(snapshot)}\n\n证据 ID 只能使用 fmp:quote、fmp:profile、fmp:financials、fmp:estimates、fmp:technicals、fmp:insiders、fmp:filings、fmp:earnings、fmp:macro、fmp:sentiment、news:N。价格、指标、财务和事件必须来自快照；缺失数据要直说。每个字段都应写出充分推理，不要把详细报告压缩成一句话。禁止杜撰借券成本、期权隐波、空头比例、用户账户规模或用户可承受亏损。内部人卖出可以作为风险信号，但若快照不能确认交易计划和动机，不得单独视为确定性卖出证据。`;
+  return `研究标的：${symbol}\n冻结数据快照：${JSON.stringify(snapshot)}\n\n证据 ID 只能使用 fmp:quote、fmp:profile、fmp:financials、fmp:estimates、fmp:technicals、fmp:insiders、fmp:filings、fmp:earnings、fmp:macro、fmp:sentiment、news:N。价格、指标、财务和事件必须来自快照；缺失数据要直说。每个字段都应写出充分推理，不要把详细报告压缩成一句话。禁止杜撰借券成本、期权隐波、空头比例、用户账户规模或用户可承受亏损；快照没有期权数据时不得建议具体期权策略。内部人卖出可以作为风险信号，但若快照不能确认交易计划和动机，不得单独视为确定性卖出证据。对强周期公司不得只用 trailing PE 下结论，必须同时讨论 forward 估值、盈利周期位置、预测兑现条件和现金流。`;
 }
 
 export function nextResearchStage(stages: StoredStages): ResearchStageName | null {
@@ -42,7 +42,7 @@ export async function runResearchStage(stage: ResearchStageName, symbol: string,
     case "execution":
       return generateStagedObject("execution_and_risk", executionStageSchema, system, `${frozen}\n\n冻结分析与研究经理裁决：${JSON.stringify({ analysts: { fundamentals: stages.fundamentals, technical: stages.technical, news: stages.news, sentiment: stages.sentiment }, debate: stages.debate })}\n\n你先作为交易员制定详细的条件化执行计划，再由激进、中性、保守三位风险委员分别压力测试。计划必须包含当前姿态、分批进入/加减仓条件、事件前后规则、上下行参考、风险收益与逻辑失效条件。allocationPct 仅指计划仓位内部的分批比例，不能写成用户总资产、可用资金或账户净值比例；风险委员也不得建议用户总资产百分比。priceLevel 只能引用冻结数据，无法确认则 null。快照没有借券费率时不得估算借券成本；没有账户信息时不得写账户风险预算。不要保证收益。`);
     case "portfolio":
-      return generateStagedObject("portfolio_decision", portfolioStageSchema, system, `${frozen}\n\n完整研究流程产物：${JSON.stringify(stages)}\n\n你是组合经理，负责最终汇总而不是重新发明事实。给出 BUY/HOLD/SELL/WATCH 条件化评级、目标计划仓位描述、事件姿态、价格框架和主要风险。targetPosition 只能用空仓/观察仓/小仓/中性仓等计划层级描述，不得给用户总资产或账户净值百分比；不得沿用前序角色中任何无来源的借券成本、账户风险预算或确定性内部人动机。executiveSummary 先给结论与行动，再列 3-5 条核心理由和 3-6 个风险触发；同时生成完整的快速摘要字段。facts 至少 6 条，sections 必须覆盖基本面、技术面、新闻宏观、情绪四部分，scenarios 至少包含乐观/基准/悲观三种，dataStatus 逐类披露成功、降级或缺失。所有内容应与前述角色结论一致。`);
+      return generateStagedObject("portfolio_decision", portfolioStageSchema, system, `${frozen}\n\n完整研究流程产物：${JSON.stringify(stages)}\n\n你是组合经理，负责最终汇总而不是重新发明事实。给出 BUY/HOLD/SELL/WATCH 条件化评级、目标计划仓位描述、事件姿态、价格框架和主要风险。targetPosition 只能用空仓/观察仓/小仓/中性仓等计划层级描述，不得给用户总资产或账户净值百分比；不得沿用前序角色中任何无来源的借券成本、账户风险预算、具体期权策略或确定性内部人动机。结论必须条件化，禁止使用“无论事件结果如何”一类否定未来证据的绝对表述。对强周期公司，必须平衡 trailing PE、forward 估值、周期位置和自由现金流，不得把单一静态估值直接等同于买卖信号。executiveSummary 先给结论与行动，再列 3-5 条核心理由和 3-6 个风险触发；同时生成完整的快速摘要字段。facts 至少 6 条，sections 必须覆盖基本面、技术面、新闻宏观、情绪四部分，scenarios 至少包含乐观/基准/悲观三种，dataStatus 逐类披露成功、降级或缺失。所有内容应与前述角色结论一致。`);
   }
 }
 
