@@ -32,7 +32,11 @@ export async function POST(request: NextRequest) {
       const sourceContent = source?.content as { pipelineVersion?: string; snapshot?: unknown; stages?: StoredStages } | undefined;
       if (!source || source.symbol !== symbol || sourceContent?.pipelineVersion !== "staged-v1" || !sourceContent.snapshot || !sourceContent.stages) return NextResponse.json({ error: "没有找到可用于修订的完整研究报告。" }, { status: 404 });
       const keepUntil = { debate: 4, execution: 5, portfolio: 6 }[restartFrom];
-      const keptStages = Object.fromEntries(Object.entries(sourceContent.stages).filter(([name]) => ["fundamentals", "technical", "news", "sentiment", "debate", "execution"].indexOf(name) < keepUntil));
+      const orderedStages = ["fundamentals", "technical", "news", "sentiment", "debate", "execution", "portfolio"];
+      const keptStages = Object.fromEntries(Object.entries(sourceContent.stages).filter(([name]) => {
+        const index = orderedStages.indexOf(name);
+        return index >= 0 && index < keepUntil;
+      }));
       const timestamp = new Date();
       const slug = `${symbol.toLowerCase()}-deep-${timestamp.toISOString().replace(/[:.]/g, "-").toLowerCase()}`;
       const { error } = await supabase.from("reports").insert({
