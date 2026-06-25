@@ -74,7 +74,7 @@ async function fetchFilingText(filing: Record<string, unknown>): Promise<FilingT
       filingDate: text(filing.filingDate),
       url,
       title: cleaned.slice(0, 160),
-      text: cleaned.slice(0, 12_000),
+      text: cleaned.slice(0, 6_000),
     };
   } catch {
     return null;
@@ -159,7 +159,7 @@ export async function getFmpSnapshot(symbol: string) {
   const secFilings = rows(raw.secFilings ?? []).slice(0, 30);
   const secFilingTexts = (await Promise.all(secFilings
     .filter((filing) => /8-K|10-Q|10-K/i.test(text(filing.formType)))
-    .slice(0, 5)
+    .slice(0, 3)
     .map(fetchFilingText))).filter((filing): filing is FilingText => filing !== null);
   const history = rows(raw.history ?? []).map((row) => ({
     date: String(row.date ?? ""),
