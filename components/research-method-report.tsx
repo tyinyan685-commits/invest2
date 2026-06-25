@@ -3,6 +3,14 @@ import type { ResearchOutput } from "@/lib/llm";
 
 export function ResearchMethodReport({ analysis }: { analysis: ResearchOutput }) {
   if (analysis.methodologyVersion !== "deep-v2") return null;
+  const scenarioDecisionPlan = analysis.scenarioDecisionPlan ?? analysis.scenarios.map((scenario) => ({
+    name: scenario.name,
+    trigger: scenario.condition,
+    action: scenario.interpretation,
+    invalidation: analysis.tradePlan.invalidation,
+  }));
+  const decisionFramework = analysis.decisionFramework;
+  const positionActions = analysis.positionActions;
   const analystCards = [
     ["基本面分析师", analysis.analysts.fundamentals.judgment, [analysis.analysts.fundamentals.quality, analysis.analysts.fundamentals.earningsTrend, analysis.analysts.fundamentals.valuation, analysis.analysts.fundamentals.estimates, analysis.analysts.fundamentals.cashFlowAndBalanceSheet, `主要风险：${analysis.analysts.fundamentals.mainRisk}`]],
     ["市场分析师", analysis.analysts.technical.judgment, [analysis.analysts.technical.trend, analysis.analysts.technical.momentum, analysis.analysts.technical.volatility, analysis.analysts.technical.volumePrice]],
@@ -15,6 +23,24 @@ export function ResearchMethodReport({ analysis }: { analysis: ResearchOutput })
       <div className="method-decision-rating"><span>组合经理最终评级</span><strong>{analysis.portfolioManager.finalRating}</strong><b>{analysis.portfolioManager.targetPosition}</b></div>
       <div><span className="section-kicker">FINAL DECISION</span><h2>{analysis.executiveSummary.oneSentence}</h2><p>{analysis.portfolioManager.ratingReason}</p><div className="decision-action"><Target size={16} /><b>{analysis.executiveSummary.positionAction}</b><span>{analysis.portfolioManager.eventStance}</span></div><div className="portfolio-detail"><p><b>执行摘要</b>{analysis.portfolioManager.actionSummary}</p><p><b>价格框架</b>{analysis.portfolioManager.priceFramework}</p><p><b>首要风险</b>{analysis.portfolioManager.topRisks.join("；")}</p></div></div>
     </section>
+
+    {decisionFramework && <section className="method-section decision-framework-section">
+      <div className="method-heading"><span className="section-kicker">DECISION MATRIX</span><h2>决策矩阵</h2><p>{decisionFramework.overallLogic}</p></div>
+      <div className="decision-framework-grid">
+        <article><span>公司质地</span><h3>{decisionFramework.companyQuality.label}</h3><p>{decisionFramework.companyQuality.rationale}</p></article>
+        <article><span>当前择时</span><h3>{decisionFramework.timingState.label}</h3><p>{decisionFramework.timingState.rationale}</p></article>
+        <article><span>事件状态</span><h3>{decisionFramework.eventRegime.label}</h3><p>{decisionFramework.eventRegime.rationale}</p></article>
+      </div>
+    </section>}
+
+    {positionActions && <section className="method-section position-actions-section">
+      <div className="method-heading"><span className="section-kicker">POSITION ACTIONS</span><h2>不同持仓状态怎么做</h2></div>
+      <div className="position-actions-grid">
+        <article><span>无仓者</span><p><b>事件前</b>{positionActions.noPosition.preEvent}</p><p><b>隔夜</b>{positionActions.noPosition.overnight}</p>{positionActions.noPosition.postEventPlan.map((item, index) => <p key={`no-${index}`}><b>后续</b>{item}</p>)}</article>
+        <article><span>已有持仓者</span><p><b>当前</b>{positionActions.existingHolder.preEventAction}</p><p><b>风险上限</b>{positionActions.existingHolder.maxEventRisk}</p>{positionActions.existingHolder.postEventPlan.map((item, index) => <p key={`holder-${index}`}><b>后续</b>{item}</p>)}</article>
+        <article><span>做空者</span><p><b>{positionActions.shortSeller.allowed ? "允许" : "不建议"}</b>{positionActions.shortSeller.rationale}</p></article>
+      </div>
+    </section>}
 
     <section className="method-grid-block">
       <div><h3><CheckCircle2 /> 核心理由</h3>{analysis.executiveSummary.coreReasons.map((reason, index) => <article className="method-evidence-row" key={`${reason.point}-${index}`}><b>{index + 1}</b><p>{reason.point}<small>{reason.strength} · {reason.evidenceIds.join(" · ")}</small></p></article>)}</div>
@@ -29,6 +55,11 @@ export function ResearchMethodReport({ analysis }: { analysis: ResearchOutput })
         {analysis.tradePlan.reduceSteps.map((step, index) => <div className="plan-row plan-reduce" key={`reduce-${index}`}><b>降低</b><span>{step.condition}</span><span>{step.action}</span><span>-</span><span>{step.priceLevel === null ? "-" : step.priceLevel.toLocaleString()}</span></div>)}
       </div>
       <div className="plan-notes"><p><b>事件规则</b>{analysis.tradePlan.eventRules.join("；")}</p><p><b>上行参考</b>{analysis.tradePlan.upsideReferences.length ? analysis.tradePlan.upsideReferences.join(" / ") : "待核验"}</p><p><b>下行参考</b>{analysis.tradePlan.downsideReferences.length ? analysis.tradePlan.downsideReferences.join(" / ") : "待核验"}</p><p><b>逻辑失效</b>{analysis.tradePlan.invalidation}</p><p><b>风险收益</b>{analysis.tradePlan.riskReward}</p></div>
+    </section>
+
+    <section className="method-section scenario-decision-section">
+      <div className="method-heading"><span className="section-kicker">SCENARIO PLAN</span><h2>情景交易计划</h2></div>
+      <div className="scenario-decision-list">{scenarioDecisionPlan.map((scenario, index) => <article key={`${scenario.name}-${index}`}><span>{scenario.name}</span><p><b>触发</b>{scenario.trigger}</p><p><b>动作</b>{scenario.action}</p><p><b>失效</b>{scenario.invalidation}</p></article>)}</div>
     </section>
 
     <section className="method-section">

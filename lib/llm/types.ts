@@ -44,6 +44,23 @@ export const researchOutputSchema = z.object({
     invalidation: z.string(),
     riskReward: z.string(),
   }),
+  decisionFramework: z.object({
+    companyQuality: z.object({ label: z.string(), rationale: z.string() }),
+    timingState: z.object({ label: z.string(), rationale: z.string() }),
+    eventRegime: z.object({ label: z.string(), rationale: z.string() }),
+    overallLogic: z.string(),
+  }).optional(),
+  positionActions: z.object({
+    noPosition: z.object({ preEvent: z.string(), overnight: z.string(), postEventPlan: z.array(z.string()).min(1) }),
+    existingHolder: z.object({ preEventAction: z.string(), maxEventRisk: z.string(), postEventPlan: z.array(z.string()).min(1) }),
+    shortSeller: z.object({ allowed: z.boolean(), rationale: z.string() }),
+  }).optional(),
+  scenarioDecisionPlan: z.array(z.object({
+    name: z.string(),
+    trigger: z.string(),
+    action: z.string(),
+    invalidation: z.string(),
+  })).optional(),
   portfolioManager: z.object({
     finalRating: z.enum(["BUY", "HOLD", "SELL", "WATCH"]),
     ratingReason: z.string(),
