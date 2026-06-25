@@ -10,6 +10,7 @@ export interface PriceBar {
 }
 
 type JsonValue = Record<string, unknown> | Array<Record<string, unknown>>;
+type FilingText = { formType: string; filingDate: string; url: string; title: string; text: string };
 
 async function fmpFetch(path: string, params: Record<string, string | number> = {}): Promise<JsonValue> {
   const apiKey = process.env.FMP_API_KEY;
@@ -35,6 +36,49 @@ function firstValidRow(value: JsonValue): Record<string, unknown> | null {
 function number(value: unknown): number | null {
   const parsed = typeof value === "number" ? value : Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function cleanFilingHtml(html: string) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&#160;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function fetchFilingText(filing: Record<string, unknown>): Promise<FilingText | null> {
+  const url = text(filing.finalLink) || text(filing.link);
+  if (!url || !/^https:\/\/www\.sec\.gov\//i.test(url)) return null;
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "invest2 personal research contact@example.com",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+      signal: AbortSignal.timeout(20_000),
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const cleaned = cleanFilingHtml(await response.text());
+    if (cleaned.length < 200) return null;
+    return {
+      formType: text(filing.formType),
+      filingDate: text(filing.filingDate),
+      url,
+      title: cleaned.slice(0, 160),
+      text: cleaned.slice(0, 12_000),
+    };
+  } catch {
+    return null;
+  }
 }
 
 function sma(values: number[], period: number): number | null {
@@ -112,6 +156,11 @@ export async function getFmpSnapshot(symbol: string) {
     catch (error) { return [key, { error: error instanceof Error ? error.message : "unknown error" }] as const; }
   }));
   const raw = Object.fromEntries(entries) as Record<string, JsonValue>;
+  const secFilings = rows(raw.secFilings ?? []).slice(0, 30);
+  const secFilingTexts = (await Promise.all(secFilings
+    .filter((filing) => /8-K|10-Q|10-K/i.test(text(filing.formType)))
+    .slice(0, 5)
+    .map(fetchFilingText))).filter((filing): filing is FilingText => filing !== null);
   const history = rows(raw.history ?? []).map((row) => ({
     date: String(row.date ?? ""),
     open: number(row.open) ?? 0,
@@ -174,7 +223,8 @@ export async function getFmpSnapshot(symbol: string) {
     },
     context: {
       insiderTrading: rows(raw.insiderTrading ?? []).slice(0, 50),
-      secFilings: rows(raw.secFilings ?? []).slice(0, 30),
+      secFilings,
+      secFilingTexts,
       earningsCalendar: rows(raw.earningsCalendar ?? []).filter((row) => row.symbol === symbol).slice(0, 5),
       treasuryRates: rows(raw.treasuryRates ?? []).slice(0, 14),
       economicCalendar: rows(raw.economicCalendar ?? []).filter((row) => {
