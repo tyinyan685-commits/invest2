@@ -14,9 +14,6 @@ importers:
       '@supabase/supabase-js':
         specifier: latest
         version: 2.108.2
-      longbridge:
-        specifier: ^4.3.2
-        version: 4.3.2
       lucide-react:
         specifier: latest
         version: 1.21.0(react@19.2.7)
@@ -1397,42 +1394,6 @@ packages:
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-
-  longbridge-darwin-arm64@4.3.2:
-    resolution: {integrity: sha512-FUjgmxULHLWtmzz2J+Ylhojf8309UX+WG0Lawr5RisqgsuQeB7n3uzmrSz/v+xUItGkQykFy0NK/+CRpNCaWHQ==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [darwin]
-
-  longbridge-darwin-x64@4.3.2:
-    resolution: {integrity: sha512-GAn2LrVCgwtWFBeGcPkGPhkK8cEqOhQAWm5DIDyTQuElBytsElIT2LIgLuZ/OYPJjKv5JoWdOi/1dustmEZrRg==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [darwin]
-
-  longbridge-linux-arm64-gnu@4.3.2:
-    resolution: {integrity: sha512-gBVKaCbPU71y6jmLVjosEWoCfQlV2NKfmFUmIfNTPz2iBuL7e6LfGnhS02HHwB61z+h/phOoZDg634OyYl0WVg==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  longbridge-linux-x64-gnu@4.3.2:
-    resolution: {integrity: sha512-PEModF1eBNaUaxl5+pJJtJ4Zl9V1me1zjTIGbXCWFqQLgUl457fYNLtHpS3JF/E/FNu49c6chWLn6GOi0rvCeA==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  longbridge-win32-x64-msvc@4.3.2:
-    resolution: {integrity: sha512-pDOGf9AYcUTQw79/7y8R57oAYB9BTW24qw++NwKNu+gRiImq1lkCsTjptauGYZDuqbN55FVSk2f2Itwo9TQl+w==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [win32]
-
-  longbridge@4.3.2:
-    resolution: {integrity: sha512-Gg4kdy4TftAUVq8u+uY5AJ+IRqJMimLSduJBy2VtiaUZ9b6/SmXrgKnxH6Yk3VZRmnmxfTpxWc4hFf0HTEvnHQ==}
-    engines: {node: '>= 10'}
 
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -3376,29 +3337,6 @@ snapshots:
       p-locate: 5.0.0
 
   lodash.merge@4.6.2: {}
-
-  longbridge-darwin-arm64@4.3.2:
-    optional: true
-
-  longbridge-darwin-x64@4.3.2:
-    optional: true
-
-  longbridge-linux-arm64-gnu@4.3.2:
-    optional: true
-
-  longbridge-linux-x64-gnu@4.3.2:
-    optional: true
-
-  longbridge-win32-x64-msvc@4.3.2:
-    optional: true
-
-  longbridge@4.3.2:
-    optionalDependencies:
-      longbridge-darwin-arm64: 4.3.2
-      longbridge-darwin-x64: 4.3.2
-      longbridge-linux-arm64-gnu: 4.3.2
-      longbridge-linux-x64-gnu: 4.3.2
-      longbridge-win32-x64-msvc: 4.3.2
 
   loose-envify@1.4.0:
     dependencies:
