@@ -1,5 +1,5 @@
 import "server-only";
-import { Config, QuoteContext, type PrePostQuote, type SecurityQuote } from "longbridge";
+import type { PrePostQuote, SecurityQuote } from "longbridge";
 
 type SessionQuote = {
   lastDone: number | null;
@@ -63,6 +63,7 @@ function longbridgeSymbol(symbol: string) {
 
 export async function getLongbridgeQuoteSnapshot(symbol: string) {
   if (!hasLongbridgeCredentials()) return null;
+  const { Config, QuoteContext } = await import("longbridge");
   const config = Config.fromApikey(
     process.env.LONGBRIDGE_APP_KEY!,
     process.env.LONGBRIDGE_APP_SECRET!,
