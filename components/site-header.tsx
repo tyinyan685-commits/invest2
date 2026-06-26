@@ -10,15 +10,14 @@ export function SiteHeader() {
         <span className="brand-beta">BETA</span>
       </Link>
       <nav className="nav-links" aria-label="主导航">
-        <Link href="/">研究</Link>
-        <Link href="/market/2026-06-16">市场扫描</Link>
-        <Link href="/admin">股票查询</Link>
+        <Link href="/">个股研究</Link>
+        <Link href="/admin">生成记录</Link>
       </nav>
-      <button className="search-button" type="button" aria-label="搜索研究">
+      <Link className="search-button" href="/#stock-search" aria-label="搜索股票">
         <Search size={16} />
         <span>搜索股票</span>
-        <kbd>⌘ K</kbd>
-      </button>
+        <kbd>↵</kbd>
+      </Link>
     </header>
   );
 }
