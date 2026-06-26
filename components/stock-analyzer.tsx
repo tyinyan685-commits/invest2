@@ -36,6 +36,10 @@ export function StockAnalyzer({ configured }: { configured: boolean }) {
       let data = await startResponse.json() as PipelineResponse;
       if (!startResponse.ok) throw new Error(data.error ?? "创建研究任务失败");
       if (data.done) {
+        if (data.slug) {
+          window.location.assign(`/research/${data.slug}`);
+          return;
+        }
         setResult(data);
         return;
       }
@@ -50,6 +54,10 @@ export function StockAnalyzer({ configured }: { configured: boolean }) {
       }
       if (!data.done) throw new Error("研究流程尚未完成，请再次点击开始分析以续跑。 ");
       setProgress({ stage: "报告已完成", completed: 7, total: 7 });
+      if (data.slug) {
+        window.location.assign(`/research/${data.slug}`);
+        return;
+      }
       setResult(data);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "分析失败，请稍后重试。");

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, Search } from "lucide-react";
+import { Activity } from "lucide-react";
 
 export function SiteHeader() {
   return (
@@ -13,11 +13,6 @@ export function SiteHeader() {
         <Link href="/">个股研究</Link>
         <Link href="/admin">生成记录</Link>
       </nav>
-      <Link className="search-button" href="/#stock-search" aria-label="搜索股票">
-        <Search size={16} />
-        <span>搜索股票</span>
-        <kbd>↵</kbd>
-      </Link>
     </header>
   );
 }
