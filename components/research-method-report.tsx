@@ -24,6 +24,17 @@ export function ResearchMethodReport({ analysis }: { analysis: ResearchOutput })
       <div><span className="section-kicker">FINAL DECISION</span><h2>{analysis.executiveSummary.oneSentence}</h2><p>{analysis.portfolioManager.ratingReason}</p><div className="decision-action"><Target size={16} /><b>{analysis.executiveSummary.positionAction}</b><span>{analysis.portfolioManager.eventStance}</span></div><div className="portfolio-detail"><p><b>执行摘要</b>{analysis.portfolioManager.actionSummary}</p><p><b>价格框架</b>{analysis.portfolioManager.priceFramework}</p><p><b>首要风险</b>{analysis.portfolioManager.topRisks.join("；")}</p></div></div>
     </section>
 
+    {analysis.marketState && <section className="market-state-panel">
+      <div className="market-state-price"><span>实时市场状态</span><strong>{analysis.marketState.currentPrice === null ? "待核验" : analysis.marketState.currentPrice.toLocaleString()}</strong><b>{analysis.marketState.changePct === null ? "" : `${analysis.marketState.changePct > 0 ? "+" : ""}${analysis.marketState.changePct.toFixed(2)}%`}</b></div>
+      <div className="market-state-grid">
+        <article><span>价格来源</span><p>{analysis.marketState.priceSource}</p><small>{analysis.marketState.session} · {analysis.marketState.asOf}</small></article>
+        <article><span>5分钟趋势</span><p>{analysis.marketState.intradayTrend}</p></article>
+        <article><span>动量</span><p>{analysis.marketState.momentum}</p></article>
+        <article><span>量能</span><p>{analysis.marketState.volumeState}</p></article>
+      </div>
+      <p className="market-state-trigger">{analysis.marketState.triggerSummary}</p>
+    </section>}
+
     {decisionFramework && <section className="method-section decision-framework-section">
       <div className="method-heading"><span className="section-kicker">DECISION MATRIX</span><h2>决策矩阵</h2><p>{decisionFramework.overallLogic}</p></div>
       <div className="decision-framework-grid">

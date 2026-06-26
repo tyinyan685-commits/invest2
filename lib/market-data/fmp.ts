@@ -127,6 +127,77 @@ function rsi(values: number[], period = 14): number | null {
   return 100 - 100 / (1 + gains / losses);
 }
 
+function latestNumber(row: Record<string, unknown> | null, keys: string[]) {
+  if (!row) return null;
+  for (const key of keys) {
+    const value = number(row[key]);
+    if (value !== null) return value;
+  }
+  return null;
+}
+
+function timestampFrom(value: unknown) {
+  if (typeof value === "number") return new Date(value > 10_000_000_000 ? value : value * 1000).toISOString();
+  if (typeof value === "string" && value.trim()) {
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? date.toISOString() : value;
+  }
+  return null;
+}
+
+function currentMarketState(symbol: string, quote: Record<string, unknown> | null, aftermarketQuote: Record<string, unknown> | null, aftermarketTrade: Record<string, unknown> | null) {
+  const afterPrice = latestNumber(aftermarketTrade, ["price", "last", "lastSalePrice", "lastDone"]) ?? latestNumber(aftermarketQuote, ["price", "bidPrice", "askPrice", "last"]);
+  const quotePrice = latestNumber(quote, ["price", "last", "lastDone"]);
+  const previousClose = latestNumber(quote, ["previousClose", "prevClose"]);
+  const currentPrice = afterPrice ?? quotePrice;
+  const source = afterPrice !== null ? "fmp:aftermarket" : quotePrice !== null ? "fmp:quote" : "missing";
+  return {
+    symbol,
+    source,
+    session: afterPrice !== null ? "premarket_or_aftermarket" : "regular_or_latest",
+    asOf: timestampFrom(aftermarketTrade?.timestamp ?? aftermarketTrade?.date ?? aftermarketQuote?.timestamp ?? aftermarketQuote?.date ?? quote?.timestamp) ?? new Date().toISOString(),
+    currentPrice,
+    previousClose,
+    changePct: currentPrice !== null && previousClose ? ((currentPrice / previousClose) - 1) * 100 : null,
+    regularQuote: quote,
+    aftermarketQuote,
+    aftermarketTrade,
+  };
+}
+
+function technicalSnapshot(bars: PriceBar[]) {
+  const closes = bars.map((bar) => bar.close);
+  const ema12 = emaSeries(closes, 12);
+  const ema26 = emaSeries(closes, 26);
+  const macdSeries = closes.map((_, index) => (ema12[index] ?? 0) - (ema26[index] ?? 0));
+  const signalSeries = emaSeries(macdSeries, 9);
+  const bollingerSlice = closes.slice(-20);
+  const bollingerMiddle = sma(closes, 20);
+  const bollingerStdDev = standardDeviation(bollingerSlice);
+  const latest = bars.at(-1);
+  const averageVolume20 = sma(bars.map((bar) => bar.volume), 20);
+  const vwapVolume = bars.reduce((sum, bar) => sum + bar.volume, 0);
+  const vwap = vwapVolume ? bars.reduce((sum, bar) => sum + ((bar.high + bar.low + bar.close) / 3) * bar.volume, 0) / vwapVolume : null;
+  return {
+    asOf: latest?.date ?? null,
+    latestClose: latest?.close ?? null,
+    barCount: bars.length,
+    ema10: ema(closes, 10),
+    ema20: ema(closes, 20),
+    sma20: sma(closes, 20),
+    vwap,
+    rsi14: rsi(closes),
+    macd: macdSeries.at(-1) ?? null,
+    macdSignal: signalSeries.at(-1) ?? null,
+    macdHistogram: macdSeries.length && signalSeries.length ? (macdSeries.at(-1) ?? 0) - (signalSeries.at(-1) ?? 0) : null,
+    bollingerMiddle,
+    bollingerUpper: bollingerMiddle === null ? null : bollingerMiddle + 2 * bollingerStdDev,
+    bollingerLower: bollingerMiddle === null ? null : bollingerMiddle - 2 * bollingerStdDev,
+    atr14: atr(bars),
+    volumeRatio20: latest && averageVolume20 ? latest.volume / averageVolume20 : null,
+  };
+}
+
 export async function getFmpSnapshot(symbol: string) {
   const to = new Date();
   const from = new Date(to);
@@ -151,6 +222,7 @@ export async function getFmpSnapshot(symbol: string) {
     socialSentiment: fmpFetch("historical-social-sentiment", { symbol, limit: 100 }),
     aftermarketQuote: fmpFetch("aftermarket-quote", { symbol }),
     aftermarketTrade: fmpFetch("aftermarket-trade", { symbol }),
+    intraday5Min: fmpFetch("historical-chart/5min", { symbol }),
   };
 
   const entries = await Promise.all(Object.entries(requests).map(async ([key, request]) => {
@@ -184,11 +256,22 @@ export async function getFmpSnapshot(symbol: string) {
   const yearStart = history.find((bar) => bar.date.slice(0, 4) === (last?.date ?? "").slice(0, 4));
   const recentTen = history.slice(-10);
   const averageVolume20 = sma(history.map((bar) => bar.volume), 20);
+  const quote = firstValidRow(raw.quote ?? []);
+  const aftermarketQuote = firstValidRow(raw.aftermarketQuote ?? []);
+  const aftermarketTrade = firstValidRow(raw.aftermarketTrade ?? []);
+  const intraday5Min = rows(raw.intraday5Min ?? []).map((row) => ({
+    date: String(row.date ?? row.datetime ?? ""),
+    open: number(row.open) ?? 0,
+    high: number(row.high) ?? 0,
+    low: number(row.low) ?? 0,
+    close: number(row.close) ?? 0,
+    volume: number(row.volume) ?? 0,
+  })).filter((bar) => bar.date && bar.close > 0).sort((a, b) => a.date.localeCompare(b.date)).slice(-120);
 
   return {
     provider: "FMP",
     retrievedAt: new Date().toISOString(),
-    quote: firstValidRow(raw.quote ?? []),
+    quote,
     profile: firstValidRow(raw.profile ?? []),
     financials: {
       income: rows(raw.income ?? []).slice(0, 4),
@@ -199,8 +282,15 @@ export async function getFmpSnapshot(symbol: string) {
       estimates: rows(raw.estimates ?? []).slice(0, 4),
     },
     aftermarket: {
-      quote: firstValidRow(raw.aftermarketQuote ?? []),
-      trade: firstValidRow(raw.aftermarketTrade ?? []),
+      quote: aftermarketQuote,
+      trade: aftermarketTrade,
+    },
+    realtime: {
+      current: currentMarketState(symbol, quote, aftermarketQuote, aftermarketTrade),
+      intraday5Min: {
+        indicators: technicalSnapshot(intraday5Min),
+        recentBars: intraday5Min.slice(-30),
+      },
     },
     technicals: {
       asOf: last?.date ?? null,
