@@ -14,6 +14,9 @@ importers:
       '@supabase/supabase-js':
         specifier: latest
         version: 2.108.2
+      longbridge:
+        specifier: ^4.3.2
+        version: 4.3.2
       lucide-react:
         specifier: latest
         version: 1.21.0(react@19.2.7)
@@ -22,7 +25,7 @@ importers:
         version: 16.2.9(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       openai:
         specifier: latest
-        version: 6.44.0(zod@4.4.3)
+        version: 6.45.0(zod@4.4.3)
       react:
         specifier: latest
         version: 19.2.7
@@ -38,7 +41,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: latest
-        version: 26.0.0
+        version: 26.0.1
       '@types/react':
         specifier: latest
         version: 19.2.17
@@ -493,8 +496,8 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/node@26.0.0':
-    resolution: {integrity: sha512-vf2YFi1iY9lHGwNJMs01biZFbKJkrZR1T6/MlzjhJLPdntOHLhTrDSnSVcdtvjihi4VQNlrFRIxLsDBlQpAipA==}
+  '@types/node@26.0.1':
+    resolution: {integrity: sha512-fc3KiUoBt6kie0N9bIW3E47vZsuaMf0PM2AaUpLCLT0s/LvX1nxAim6Fc049cNxODPpGm6qRAuUOB86SkRuPQw==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -1395,6 +1398,42 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
+  longbridge-darwin-arm64@4.3.2:
+    resolution: {integrity: sha512-FUjgmxULHLWtmzz2J+Ylhojf8309UX+WG0Lawr5RisqgsuQeB7n3uzmrSz/v+xUItGkQykFy0NK/+CRpNCaWHQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+
+  longbridge-darwin-x64@4.3.2:
+    resolution: {integrity: sha512-GAn2LrVCgwtWFBeGcPkGPhkK8cEqOhQAWm5DIDyTQuElBytsElIT2LIgLuZ/OYPJjKv5JoWdOi/1dustmEZrRg==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [darwin]
+
+  longbridge-linux-arm64-gnu@4.3.2:
+    resolution: {integrity: sha512-gBVKaCbPU71y6jmLVjosEWoCfQlV2NKfmFUmIfNTPz2iBuL7e6LfGnhS02HHwB61z+h/phOoZDg634OyYl0WVg==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  longbridge-linux-x64-gnu@4.3.2:
+    resolution: {integrity: sha512-PEModF1eBNaUaxl5+pJJtJ4Zl9V1me1zjTIGbXCWFqQLgUl457fYNLtHpS3JF/E/FNu49c6chWLn6GOi0rvCeA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  longbridge-win32-x64-msvc@4.3.2:
+    resolution: {integrity: sha512-pDOGf9AYcUTQw79/7y8R57oAYB9BTW24qw++NwKNu+gRiImq1lkCsTjptauGYZDuqbN55FVSk2f2Itwo9TQl+w==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [win32]
+
+  longbridge@4.3.2:
+    resolution: {integrity: sha512-Gg4kdy4TftAUVq8u+uY5AJ+IRqJMimLSduJBy2VtiaUZ9b6/SmXrgKnxH6Yk3VZRmnmxfTpxWc4hFf0HTEvnHQ==}
+    engines: {node: '>= 10'}
+
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -1506,12 +1545,21 @@ packages:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
 
-  openai@6.44.0:
-    resolution: {integrity: sha512-09/gH+8jH0RgUwsgWHAaxsKGRT5zVZ95IaJUnqAWj6XejIBmnFRwq2WUIF37VtDEsmGrtPmvCs5+yBSeZGWvkA==}
+  openai@6.45.0:
+    resolution: {integrity: sha512-5DQVNErssk0afNpTTHUm/qZPU4iKR9OYdNid8Ib4puq4gHNNvGWZht2zY4h9a8JMF949Ik6m8gQutllVPbjdnw==}
     peerDependencies:
+      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
+      '@smithy/hash-node': '>=4.3.0 <5'
+      '@smithy/signature-v4': '>=5.4.0 <6'
       ws: ^8.18.0
       zod: ^3.25 || ^4.0
     peerDependenciesMeta:
+      '@aws-sdk/credential-provider-node':
+        optional: true
+      '@smithy/hash-node':
+        optional: true
+      '@smithy/signature-v4':
+        optional: true
       ws:
         optional: true
       zod:
@@ -2268,7 +2316,7 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/node@26.0.0':
+  '@types/node@26.0.1':
     dependencies:
       undici-types: 8.3.0
 
@@ -3329,6 +3377,29 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
+  longbridge-darwin-arm64@4.3.2:
+    optional: true
+
+  longbridge-darwin-x64@4.3.2:
+    optional: true
+
+  longbridge-linux-arm64-gnu@4.3.2:
+    optional: true
+
+  longbridge-linux-x64-gnu@4.3.2:
+    optional: true
+
+  longbridge-win32-x64-msvc@4.3.2:
+    optional: true
+
+  longbridge@4.3.2:
+    optionalDependencies:
+      longbridge-darwin-arm64: 4.3.2
+      longbridge-darwin-x64: 4.3.2
+      longbridge-linux-arm64-gnu: 4.3.2
+      longbridge-linux-x64-gnu: 4.3.2
+      longbridge-win32-x64-msvc: 4.3.2
+
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 4.0.0
@@ -3443,7 +3514,7 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.2
 
-  openai@6.44.0(zod@4.4.3):
+  openai@6.45.0(zod@4.4.3):
     optionalDependencies:
       zod: 4.4.3
 

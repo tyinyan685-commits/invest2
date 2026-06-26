@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { nextResearchStage, type StoredStages } from "@/lib/llm/staged-research";
 import { getFmpSnapshot } from "@/lib/market-data/fmp";
+import { getLongbridgeQuoteSnapshot } from "@/lib/market-data/longbridge";
 import { getNewsSnapshot } from "@/lib/market-data/news";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -61,7 +62,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const marketData = await getFmpSnapshot(symbol);
+    const [fmpData, longbridgeResult] = await Promise.all([
+      getFmpSnapshot(symbol),
+      getLongbridgeQuoteSnapshot(symbol).then((quote) => ({ quote })).catch((error) => ({ error: error instanceof Error ? error.message : "Longbridge quote failed" })),
+    ]);
+    const marketData = {
+      ...fmpData,
+      longbridge: "quote" in longbridgeResult ? longbridgeResult.quote : null,
+      longbridgeError: "error" in longbridgeResult ? longbridgeResult.error : null,
+    };
     if (!marketData.profile && !marketData.quote) return NextResponse.json({ error: `没有找到 ${symbol} 的有效行情或公司资料。` }, { status: 404 });
     const news = await getNewsSnapshot(symbol, companyName(marketData.profile));
     const snapshot = { symbol, asOf: new Date().toISOString(), marketData, news };

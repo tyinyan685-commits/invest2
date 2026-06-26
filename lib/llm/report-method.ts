@@ -9,12 +9,13 @@ ${JSON.stringify(snapshot)}
 1. 所有价格、指标和事件必须锚定快照的 asOf 与最近完整收盘 bar，禁止把未来数据、盘中数据和旧读数混用。
 2. 财务、价格和技术指标只能引用快照；不得心算或编造快照中没有的数字。
 3. 新闻只是线索。公司公告、SEC/财报、FMP 财务数据为强证据；媒体为中等；社交情绪和纯价格推断为弱证据。
-4. 每个核心观点必须给 evidenceIds。可用：fmp:quote、fmp:profile、fmp:financials、fmp:estimates、fmp:technicals、fmp:insiders、fmp:filings、fmp:filing-text、fmp:earnings、fmp:macro、fmp:sentiment、news:N。
+4. 每个核心观点必须给 evidenceIds。可用：fmp:quote、fmp:profile、fmp:financials、fmp:estimates、fmp:technicals、fmp:insiders、fmp:filings、fmp:filing-text、fmp:earnings、fmp:macro、fmp:sentiment、longbridge:quote、news:N。
 5. 数据缺失必须写入 dataStatus 与 missingEvidence，不能用模型记忆补齐。
 6. 交易建议必须是条件化计划，不得保证收益；用收盘确认、财报/宏观事件和逻辑失效条件约束。
 7. 必须采用用户提供的 MU 报告式决策纪律：先判断“公司质地 / 当前择时 / 事件状态”，再给评级；“不追/无仓观望”不能翻译成“已有持仓立即卖出”；SELL 只能用于基本面逻辑证伪、指引/现金流恶化、关键价位收盘跌破且上行逻辑受损，或强证据风险事件。
 8. 对临近财报等二元事件：若质地强但缺少安全垫，标准表达是 HOLD/WATCH、不追、不空、无仓可零仓过夜、持仓者降到可承受事件波动；事件落地且强于预期后，才可按收盘确认、回踩承接和失效条件转为 BUY/分批买入。
 9. 若数据快照包含 marketData.context.secFilingTexts，必须优先读取最新 8-K/财报新闻稿正文，把其中的营收、EPS、毛利率、指引和管理层表述作为强证据，证据 ID 写 fmp:filing-text。
+10. 若数据快照包含 marketData.longbridge，必须优先用其中的 lastDone、preMarketQuote、postMarketQuote、overnightQuote 校准当前/盘前/盘后/夜盘价格；技术指标仍以 FMP 日线为准。证据 ID 写 longbridge:quote。
 
 【按顺序完成内部研究流程】
 A. 四份冻结分析师报告
