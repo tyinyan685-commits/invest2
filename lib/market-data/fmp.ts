@@ -149,6 +149,8 @@ export async function getFmpSnapshot(symbol: string) {
     treasuryRates: fmpFetch("treasury-rates", { from: date(new Date(to.getTime() - 14 * 86_400_000)), to: date(to) }),
     economicCalendar: fmpFetch("economic-calendar", { from: date(to), to: date(new Date(to.getTime() + 21 * 86_400_000)) }),
     socialSentiment: fmpFetch("historical-social-sentiment", { symbol, limit: 100 }),
+    aftermarketQuote: fmpFetch("aftermarket-quote", { symbol }),
+    aftermarketTrade: fmpFetch("aftermarket-trade", { symbol }),
   };
 
   const entries = await Promise.all(Object.entries(requests).map(async ([key, request]) => {
@@ -195,6 +197,10 @@ export async function getFmpSnapshot(symbol: string) {
       ratios: rows(raw.ratios ?? []).slice(0, 4),
       metrics: rows(raw.metrics ?? []).slice(0, 4),
       estimates: rows(raw.estimates ?? []).slice(0, 4),
+    },
+    aftermarket: {
+      quote: firstValidRow(raw.aftermarketQuote ?? []),
+      trade: firstValidRow(raw.aftermarketTrade ?? []),
     },
     technicals: {
       asOf: last?.date ?? null,
