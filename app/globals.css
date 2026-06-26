@@ -30,6 +30,12 @@ button { color: inherit; }
 .nav-links a:hover { color: var(--ink); }
 .search-button { margin-left: auto; display: flex; align-items: center; gap: 8px; width: 215px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.55); padding: 9px 10px; color: #777d75; font-size: 12px; cursor: pointer; }
 .search-button kbd { margin-left: auto; border: 1px solid #d7d9d2; background: #f7f7f3; border-radius: 4px; padding: 1px 5px; font-size: 10px; }
+.header-stock-search { margin-left: auto; width: min(360px, 38vw); display: flex; align-items: center; gap: 8px; padding: 6px 7px 6px 11px; border: 1px solid #dbe3ee; border-radius: 999px; background: rgba(255,255,255,.82); box-shadow: 0 8px 28px rgba(15,23,42,.06); }
+.header-stock-search svg { color: #64748b; flex: 0 0 auto; }
+.header-stock-search input[type="text"], .header-stock-search input[name="symbol"] { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: #142033; font-size: 13px; font-weight: 800; text-transform: uppercase; }
+.header-stock-search input::placeholder { color: #94a3b8; font-weight: 600; text-transform: none; }
+.header-stock-search button { border: 0; border-radius: 999px; padding: 7px 12px; color: #f8fafc; background: #111827; font-size: 12px; font-weight: 800; cursor: pointer; }
+.header-stock-search button:hover { background: #1f2937; }
 
 .hero { padding: 90px 0 96px; }
 .eyebrow, .section-kicker { display: inline-flex; align-items: center; gap: 7px; color: #676e66; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
@@ -84,6 +90,7 @@ button { color: inherit; }
 .report-page { background: #eeeee8; }
 .report-shell { padding-bottom: 90px; }
 .report-topbar { padding: 28px 0 20px; display: flex; justify-content: space-between; color: #6b726a; font-size: 10px; }
+.report-topbar-meta { justify-content: flex-end; }
 .report-topbar > a, .report-topbar div, .report-topbar span, .report-topbar button { display: flex; align-items: center; gap: 6px; }
 .report-topbar div { gap: 18px; }
 .report-topbar button { border: 1px solid #d3d5cd; background: white; border-radius: 6px; padding: 7px 10px; cursor: pointer; }
@@ -562,6 +569,10 @@ button { color: inherit; }
 @media (max-width: 620px) {
   .shell { width: min(100% - 28px, 1180px); }
   .site-header { height: 62px; padding: 0 14px; }
+  .brand-beta { display: none; }
+  .header-stock-search { width: min(220px, 58vw); gap: 5px; padding-left: 9px; }
+  .header-stock-search input[type="text"], .header-stock-search input[name="symbol"] { font-size: 12px; }
+  .header-stock-search button { padding: 6px 9px; font-size: 11px; }
   .search-button { width: 36px; height: 36px; padding: 0; justify-content: center; }
   .search-button span, .search-button kbd { display: none; }
   .hero { padding: 58px 0 68px; }

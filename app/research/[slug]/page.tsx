@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft, Clock3 } from "lucide-react";
+import { Clock3 } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { ResearchOutput } from "@/lib/llm";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -38,7 +37,7 @@ export default async function GeneratedResearchPage({ params }: PageProps) {
   return (
     <main className="generated-report-page">
       <div className="shell generated-report-shell">
-        <div className="report-topbar"><Link href="/admin"><ArrowLeft size={15} /> 查询其他股票</Link><span><Clock3 size={14} /> {new Date(report.as_of).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}</span></div>
+        <div className="report-topbar report-topbar-meta"><span><Clock3 size={14} /> {new Date(report.as_of).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}</span></div>
         <section className="analysis-result standalone-result">
           <header>
             <div><span className="section-kicker">GENERATED RESEARCH · {report.symbol}</span><h1>{analysis.headline}</h1><p>{analysis.summary}</p></div>

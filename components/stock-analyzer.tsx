@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { AlertTriangle, ArrowUpRight, CheckCircle2, LoaderCircle, Play, RefreshCw, Search } from "lucide-react";
 import type { ResearchOutput } from "@/lib/llm";
 import { ResearchMethodReport } from "@/components/research-method-report";
@@ -19,20 +19,31 @@ const stageLabels: Record<string, string> = {
   portfolio: "组合经理最终决策",
 };
 
-export function StockAnalyzer({ configured }: { configured: boolean }) {
-  const [symbol, setSymbol] = useState("MU");
+export function StockAnalyzer({ configured, initialSymbol = "MU", autoRun = false }: { configured: boolean; initialSymbol?: string; autoRun?: boolean }) {
+  const normalizedInitialSymbol = initialSymbol.trim().toUpperCase() || "MU";
+  const [symbol, setSymbol] = useState(normalizedInitialSymbol);
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<{ stage: string; completed: number; total: number } | null>(null);
+  const autoStarted = useRef(false);
 
-  async function analyze(event: FormEvent, force = false) {
-    event.preventDefault();
+  useEffect(() => {
+    if (!autoRun || !configured || autoStarted.current) return;
+    autoStarted.current = true;
+    void runAnalysis(normalizedInitialSymbol);
+  }, [autoRun, configured, normalizedInitialSymbol]);
+
+  async function runAnalysis(requestSymbol: string, force = false) {
+    const nextSymbol = requestSymbol.trim().toUpperCase();
+    if (!nextSymbol) return;
+    setSymbol(nextSymbol);
     setLoading(true);
     setError(null);
+    setResult(null);
     setProgress({ stage: "正在冻结行情、财务与新闻数据", completed: 0, total: 7 });
     try {
-      const startResponse = await fetch("/api/research/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbol, force }) });
+      const startResponse = await fetch("/api/research/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbol: nextSymbol, force }) });
       let data = await startResponse.json() as PipelineResponse;
       if (!startResponse.ok) throw new Error(data.error ?? "创建研究任务失败");
       if (data.done) {
@@ -64,6 +75,11 @@ export function StockAnalyzer({ configured }: { configured: boolean }) {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function analyze(event: FormEvent, force = false) {
+    event.preventDefault();
+    await runAnalysis(symbol, force);
   }
 
   return (
