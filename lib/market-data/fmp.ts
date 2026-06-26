@@ -145,17 +145,29 @@ function timestampFrom(value: unknown) {
   return null;
 }
 
+function freshnessMinutes(asOf: string | null) {
+  if (!asOf) return null;
+  const time = new Date(asOf).getTime();
+  if (!Number.isFinite(time)) return null;
+  return Math.max(0, Math.round((Date.now() - time) / 60_000));
+}
+
 function currentMarketState(symbol: string, quote: Record<string, unknown> | null, aftermarketQuote: Record<string, unknown> | null, aftermarketTrade: Record<string, unknown> | null) {
   const afterPrice = latestNumber(aftermarketTrade, ["price", "last", "lastSalePrice", "lastDone"]) ?? latestNumber(aftermarketQuote, ["price", "bidPrice", "askPrice", "last"]);
   const quotePrice = latestNumber(quote, ["price", "last", "lastDone"]);
   const previousClose = latestNumber(quote, ["previousClose", "prevClose"]);
   const currentPrice = afterPrice ?? quotePrice;
-  const source = afterPrice !== null ? "fmp:aftermarket" : quotePrice !== null ? "fmp:quote" : "missing";
+  const asOf = timestampFrom(aftermarketTrade?.timestamp ?? aftermarketTrade?.date ?? aftermarketQuote?.timestamp ?? aftermarketQuote?.date ?? quote?.timestamp) ?? new Date().toISOString();
+  const minutesOld = freshnessMinutes(asOf);
+  const isExtendedFresh = afterPrice !== null && minutesOld !== null && minutesOld <= 20;
+  const source = afterPrice !== null ? (isExtendedFresh ? "fmp:aftermarket" : "fmp:aftermarket_delayed") : quotePrice !== null ? "fmp:quote" : "missing";
   return {
     symbol,
     source,
-    session: afterPrice !== null ? "premarket_or_aftermarket" : "regular_or_latest",
-    asOf: timestampFrom(aftermarketTrade?.timestamp ?? aftermarketTrade?.date ?? aftermarketQuote?.timestamp ?? aftermarketQuote?.date ?? quote?.timestamp) ?? new Date().toISOString(),
+    session: afterPrice !== null ? (isExtendedFresh ? "premarket_or_aftermarket" : "extended_delayed_needs_broker_check") : "regular_or_latest",
+    asOf,
+    freshnessMinutes: minutesOld,
+    isFresh: afterPrice === null || isExtendedFresh,
     currentPrice,
     previousClose,
     changePct: currentPrice !== null && previousClose ? ((currentPrice / previousClose) - 1) * 100 : null,
