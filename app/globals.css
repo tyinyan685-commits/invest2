@@ -506,6 +506,9 @@ button { color: inherit; }
 .home-analyzer-shell .generate-button:hover { background: #1f2937; }
 .home-analyzer-shell .ticker-examples { font-size: 12px; }
 .home-analyzer-shell .ticker-examples button { border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+.home-method-card { margin-top: 16px; padding: 18px 20px; border: 1px solid #dbe3ee; border-radius: 16px; background: rgba(255,255,255,.72); color: #475569; box-shadow: 0 12px 36px rgba(15,23,42,.05); }
+.home-method-card span { display: inline-flex; color: #142033; font-size: 13px; font-weight: 850; }
+.home-method-card p { margin: 8px 0 0; font-size: 14px; line-height: 1.8; }
 .compact-method-strip { padding: 42px 0; background: #111827; }
 
 .generated-report-page { background: #f6f8fb; }

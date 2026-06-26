@@ -13,6 +13,10 @@ export default async function Home({ searchParams }: HomeProps) {
       <section className="home-search-hero shell" id="stock-search">
         <div className="home-analyzer-shell">
           <StockAnalyzer configured={configured} initialSymbol={initialSymbol} autoRun={autoRun} />
+          <div className="home-method-card">
+            <span>研究方法</span>
+            <p>先冻结行情、财务、公告、新闻和实时技术指标，再按多角色流程生成：基本面分析、技术与量价、新闻宏观、情绪、牛熊辩论、交易风控，最后由组合经理给出评级、仓位动作、关键价位和风险触发。</p>
+          </div>
         </div>
       </section>
     </main>
