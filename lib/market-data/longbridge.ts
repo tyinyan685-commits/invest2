@@ -10,15 +10,18 @@ type SessionQuote = {
   prevClose: number | null;
 };
 
-function hasLongbridgeCredentials() {
-  return Boolean(process.env.LONGBRIDGE_APP_KEY && process.env.LONGBRIDGE_APP_SECRET && process.env.LONGBRIDGE_ACCESS_TOKEN);
-}
-
 type LongbridgeQuoteSnapshot = {
   provider: "Longbridge";
   retrievedAt: string;
   quote: {
     symbol: string;
+    current: {
+      lastDone: number | null;
+      timestamp: string | null;
+      session: string | null;
+      isFresh: boolean;
+      freshnessSeconds: number | null;
+    } | null;
     lastDone: number | null;
     prevClose: number | null;
     open: number | null;
@@ -34,11 +37,29 @@ type LongbridgeQuoteSnapshot = {
   };
 };
 
-export async function getLongbridgeQuoteSnapshot(_symbol: string): Promise<LongbridgeQuoteSnapshot | null> {
-  if (!hasLongbridgeCredentials()) return null;
-  // The official Node SDK ships native binaries for multiple platforms, which
-  // makes Vercel Serverless functions exceed the 250MB uncompressed limit.
-  // Keep this hook lightweight and disabled until a pure HTTP/OAuth adapter or
-  // a separate quote proxy is added.
-  return null;
+function isLongbridgeSnapshot(value: unknown): value is LongbridgeQuoteSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  return candidate.provider === "Longbridge" && typeof candidate.retrievedAt === "string" && Boolean(candidate.quote);
+}
+
+export async function getLongbridgeQuoteSnapshot(symbol: string): Promise<LongbridgeQuoteSnapshot | null> {
+  const proxyUrl = process.env.QUOTE_PROXY_URL;
+  if (!proxyUrl) return null;
+
+  const url = new URL("/quote", proxyUrl);
+  url.searchParams.set("symbol", symbol);
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (process.env.QUOTE_PROXY_TOKEN) headers.Authorization = `Bearer ${process.env.QUOTE_PROXY_TOKEN}`;
+
+  const response = await fetch(url, {
+    headers,
+    signal: AbortSignal.timeout(8_000),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Quote proxy failed with ${response.status}`);
+
+  const payload = await response.json();
+  if (!isLongbridgeSnapshot(payload)) throw new Error("Quote proxy returned an invalid Longbridge snapshot");
+  return payload;
 }

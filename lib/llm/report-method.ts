@@ -15,7 +15,7 @@ ${JSON.stringify(snapshot)}
 7. 必须采用用户提供的 MU 报告式决策纪律：先判断“公司质地 / 当前择时 / 事件状态”，再给评级；“不追/无仓观望”不能翻译成“已有持仓立即卖出”；SELL 只能用于基本面逻辑证伪、指引/现金流恶化、关键价位收盘跌破且上行逻辑受损，或强证据风险事件。
 8. 对临近财报等二元事件：若质地强但缺少安全垫，标准表达是 HOLD/WATCH、不追、不空、无仓可零仓过夜、持仓者降到可承受事件波动；事件落地且强于预期后，才可按收盘确认、回踩承接和失效条件转为 BUY/分批买入。
 9. 若数据快照包含 marketData.context.secFilingTexts，必须优先读取最新 8-K/财报新闻稿正文，把其中的营收、EPS、毛利率、指引和管理层表述作为强证据，证据 ID 写 fmp:filing-text。
-10. 当前价校准优先级：marketData.longbridge（未来代理） > marketData.realtime.current > marketData.aftermarket.quote/trade > marketData.quote。必须用 marketData.realtime.intraday5Min.indicators 约束交易建议，写入 marketState；技术指标的大级别支撑阻力仍以 FMP 日线为准。
+10. 当前价校准优先级：marketData.longbridge.quote.current（券商实时/扩展盘代理） > marketData.realtime.current > marketData.aftermarket.quote/trade > marketData.quote。必须用 marketData.realtime.intraday5Min.indicators 约束交易建议，写入 marketState；技术指标的大级别支撑阻力仍以 FMP 日线为准。
 11. 若 marketData.realtime.current.source 为 fmp:aftermarket_delayed，或 current.isFresh 为 false，必须把该价格称为“FMP 延迟扩展盘参考价/需券商核验”，不得称为实时价，不得用它单独触发追涨、止损或加仓；交易计划必须写成等待券商实时价确认。
 
 【按顺序完成内部研究流程】
