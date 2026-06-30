@@ -4,6 +4,9 @@ Small Longbridge quote proxy for the personal research site.
 
 Deploy this service separately from Vercel, for example on Railway, Render, Fly.io, or a small VPS. The main site calls this HTTP service through `QUOTE_PROXY_URL`, so the heavy Longbridge SDK is not bundled into Vercel serverless functions.
 
+For Railway, set the service root directory to `/quote-proxy`. The included
+`railway.json` forces Docker/Python builds, so Railway must not run `pnpm install`.
+
 ## Environment variables
 
 Required:

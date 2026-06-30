@@ -134,7 +134,11 @@ def quote(symbol: str = Query(..., min_length=1, max_length=24), authorization: 
 
     longbridge_symbol = _normalize_symbol(symbol)
     try:
-        config = Config.from_apikey_env()
+        config = Config.from_apikey(
+            os.environ["LONGBRIDGE_APP_KEY"],
+            os.environ["LONGBRIDGE_APP_SECRET"],
+            os.environ["LONGBRIDGE_ACCESS_TOKEN"],
+        )
         ctx = QuoteContext(config)
         response = ctx.quote([longbridge_symbol])
     except Exception as exc:  # pragma: no cover - depends on broker API
